@@ -1,5 +1,6 @@
 <html>
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 	<script type="text/javascript" src="http://code.createjs.com/createjs-2013.05.14.min.js"></script>
 	<title></title>
@@ -65,13 +66,19 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			// override JQuery
-			$.prototype.create_scene=function(map_image_src,after_scene_build_do_something){
+			$.prototype.create_scene=function(map_image_src,after_scene_build_do_something,debug_mode){
+				var debug_mode=debug_mode||false;
 				if(this.length!=0){
 					var stage = new createjs.Stage(this[0]);
 					stage.enableMouseOver(20);
 					var bgimg = stage.addChild( new createjs.Bitmap(map_image_src) ).set({scaleX:800/952,scaleY:600/714});
 					createjs.Ticker.addEventListener('tick',function(e){stage.update();});
 					if(after_scene_build_do_something){after_scene_build_do_something(stage);};
+					if(debug_mode){
+						// stage.addEventListener('click',function(e){
+							// console.log(e.stageX,e.stageY);
+						// });
+					};
 				};
 			}
 		});
@@ -91,6 +98,9 @@
 				stage.addChild(new red_green_light( 435, 310, function(e){
 					console.log(stage.addChild(new road_infomation(620,50,'data3')));
 				}));
+
+				stage.addChild(new createjs.Text("← Flow: 2000vph, speed: 68 KM/H", "bold 20px 微軟正黑體", "#6900D2").set({x:220,y:265}));
+				stage.addChild(new createjs.Text("Flow: 2000vph, speed: 68 KM/H →", "bold 20px 微軟正黑體", "#6900D2").set({x:220,y:225}));
 			};
 
 			// Assets path
@@ -104,7 +114,7 @@
 			};
 
 			// gateway_2_scene
-			$('canvas#gateway_scene').create_scene(scene_img_path[2].scene,scene_img_path[2].objects);
+			$('canvas#gateway_scene').create_scene(scene_img_path[2].scene,scene_img_path[2].objects,true);
 		});
 	</script>
 </body>
