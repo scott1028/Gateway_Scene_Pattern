@@ -1,0 +1,111 @@
+<html>
+<head>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="http://code.createjs.com/createjs-2013.05.14.min.js"></script>
+	<title></title>
+</head>
+<body>
+	<canvas id="gateway_scene" width=800 height=600></canvas>
+
+	<!-- 定義路口訊息視窗類別 -->
+	<script>
+		var road_infomation=function(x,y,data){
+			if(road_infomation.current){road_infomation.current.parent.removeChild(road_infomation.current);}
+
+			// 外框
+			this.initialize();
+			this.x=x || 0;this.y=y || 0;
+			var g = new createjs.Graphics().setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(250,200,100)).beginFill(createjs.Graphics.getRGB(235,130,0,0.5)).drawRoundRect(-150,-40,300,80,8);
+			var s = new createjs.Shape(g);
+			this.addChild(s);
+
+			// 關閉按鈕
+			var close_bt=new createjs.Container();
+			var text = new createjs.Text("X", "bold 18px Arial", "#0000FF");
+			text.x=129;
+			text.y=-35;
+			this.x=x || 0;this.y=y || 0;
+			var g = new createjs.Graphics();
+			g.setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,0,0.5)).drawRect(-10,-10,20,20);
+			var s = new createjs.Shape(g);
+			s.x=135;
+			s.y=-25
+			s.addEventListener('mouseover',function(e){e.target.graphics.clear().setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,200,0.9)).drawRect(-10,-10,20,20);e.target.addEventListener('click',function(ee){ee.target.parent.parent.parent.removeChild(ee.target.parent.parent);road_infomation.current=undefined;});document.body.style.cursor='pointer';});
+			s.addEventListener('mouseout',function(e){e.target.graphics.clear().setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,0,0.5)).drawRect(-10,-10,20,20);document.body.style.cursor='';});
+			close_bt.addChild(s);
+			close_bt.addChild(text);
+			this.addChild(close_bt);
+
+			// 如果有資料需要顯示的資料則...
+			if(data){
+				console.log(data);
+			};
+
+			// init
+			this.alpha=0;createjs.Tween.get(this).to({alpha:1},500);
+			road_infomation.current=this;
+		};road_infomation.prototype=new createjs.Container();road_infomation.current=undefined;
+	</script>
+
+	<!-- 定義紅綠燈類別 -->
+	<script>
+		var red_green_light=function(x,y,click_handle){
+			this.initialize();
+			this.x=x || 0;this.y=y || 0;
+			this.scaleX=0.75;this.scaleY=0.75;
+			var a_place=this.addChild(new createjs.Bitmap(red_green_light_img_path));
+			a_place.image.onload=function(e){a_place.set({x:-a_place.image.width/2,y:-a_place.image.height/2});};
+			this.addEventListener('mouseover',function(e){createjs.Tween.get(e.target).to({scaleX:1,scaleY:1},150);document.body.style.cursor='pointer';});
+			this.addEventListener('mouseout',function(e){createjs.Tween.get(e.target).to({scaleX:0.75,scaleY:0.75},200);document.body.style.cursor='';});
+			if(click_handle){this.addEventListener('click',click_handle);};
+		};red_green_light.prototype=new createjs.Container();
+	</script>
+
+	<!-- 場景Shader -->
+	<script type="text/javascript">
+		$(document).ready(function(){
+			// override JQuery
+			$.prototype.create_scene=function(map_image_src,after_scene_build_do_something){
+				if(this.length!=0){
+					var stage = new createjs.Stage(this[0]);
+					stage.enableMouseOver(20);
+					var bgimg = stage.addChild( new createjs.Bitmap(map_image_src) ).set({scaleX:800/952,scaleY:600/714});
+					createjs.Ticker.addEventListener('tick',function(e){stage.update();});
+					if(after_scene_build_do_something){after_scene_build_do_something(stage);};
+				};
+			}
+		});
+	</script>
+
+	<!-- Sample Code -->
+	<script>
+		$(document).ready(function(){
+			// gateway_2_objects
+			var gateway_2_objects=function(stage){
+				stage.addChild(new red_green_light( 435, 140, function(){
+					console.log(stage.addChild(new road_infomation(620,50,'data1')));
+				}));
+				stage.addChild(new red_green_light( 435, 200, function(){
+					console.log(stage.addChild(new road_infomation(620,50,'data2')));
+				}));
+				stage.addChild(new red_green_light( 435, 310, function(e){
+					console.log(stage.addChild(new road_infomation(620,50,'data3')));
+				}));
+			};
+
+			// Assets path
+			window.red_green_light_img_path='red_green_light.gif';
+			var scene_img_path={
+				2:{
+					scene:'2.png',
+					objects:gateway_2_objects,
+					red_green_light_img_path:'red_green_light.gif'
+				}
+			};
+
+			// gateway_2_scene
+			$('canvas#gateway_scene').create_scene(scene_img_path[2].scene,scene_img_path[2].objects);
+		});
+	</script>
+</body>
+</html>
