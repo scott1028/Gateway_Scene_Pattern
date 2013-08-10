@@ -16,21 +16,21 @@
 			// 外框
 			this.initialize();
 			this.x=x || 0;this.y=y || 0;
-			var g = new createjs.Graphics().setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(250,200,100)).beginFill(createjs.Graphics.getRGB(235,130,0,0.5)).drawRoundRect(-150,-40,300,80,8);
+			var g = new createjs.Graphics().setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(250,200,100)).beginFill(createjs.Graphics.getRGB(235,130,0,0.5)).drawRoundRect(0,0,500,80,8);
 			var s = new createjs.Shape(g);
 			this.addChild(s);
 
 			// 關閉按鈕
 			var close_bt=new createjs.Container();
 			var text = new createjs.Text("X", "bold 18px Arial", "#0000FF");
-			text.x=129;
-			text.y=-35;
+			text.x=478;
+			text.y=5;
 			this.x=x || 0;this.y=y || 0;
 			var g = new createjs.Graphics();
 			g.setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,0,0.5)).drawRect(-10,-10,20,20);
 			var s = new createjs.Shape(g);
-			s.x=135;
-			s.y=-25
+			s.x=484;
+			s.y=15;
 			s.addEventListener('mouseover',function(e){e.target.graphics.clear().setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,200,0.9)).drawRect(-10,-10,20,20);e.target.addEventListener('click',function(ee){ee.target.parent.parent.parent.removeChild(ee.target.parent.parent);road_infomation.current=undefined;});document.body.style.cursor='pointer';});
 			s.addEventListener('mouseout',function(e){e.target.graphics.clear().setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,0,0.5)).drawRect(-10,-10,20,20);document.body.style.cursor='';});
 			close_bt.addChild(s);
@@ -40,6 +40,12 @@
 			// 如果有資料需要顯示的資料則...
 			if(data){
 				console.log(data);
+
+				for(var i=1;i<=12;i+=3){
+					this.addChild(new createjs.Bitmap('s'+(i)+'.gif')).set({scaleX:0.5,scaleY:0.5,regX:32.5,regY:32.5,x:25+35*(i-1),y:20});
+					this.addChild(new createjs.Bitmap('s'+(i+1)+'.gif')).set({scaleX:0.5,scaleY:0.5,regX:32.5,regY:32.5,x:25+35*(i-1+1),y:20});
+					this.addChild(new createjs.Bitmap('s'+(i+2)+'.gif')).set({scaleX:0.5,scaleY:0.5,regX:32.5,regY:32.5,x:25+35*(i-1+2),y:20});
+				};
 			};
 
 			// init
@@ -90,30 +96,17 @@
 			// gateway_2_objects
 			var gateway_2_objects=function(stage){
 				stage.addChild(new red_green_light( 435, 140, function(){
-					console.log(stage.addChild(new road_infomation(620,50,'data1')));
+					console.log(stage.addChild(new road_infomation(270,20,'data1')));
 				}));
 				stage.addChild(new red_green_light( 435, 200, function(){
-					console.log(stage.addChild(new road_infomation(620,50,'data2')));
+					console.log(stage.addChild(new road_infomation(270,20,'data2')));
 				}));
 				stage.addChild(new red_green_light( 435, 310, function(e){
-					console.log(stage.addChild(new road_infomation(620,50,'data3')));
+					console.log(stage.addChild(new road_infomation(270,20,'data3')));
 				}));
 
 				stage.addChild(new createjs.Text("Flow: 2010vph, speed: 68 KM/H →", "bold 20px 微軟正黑體", "#6900D2").set({x:220,y:225}));
 				stage.addChild(new createjs.Text("← Flow: 1980vph, speed: 50 KM/H", "bold 20px 微軟正黑體", "#6900D2").set({x:220,y:265}));
-
-				// var a_place=stage.addChild(new createjs.Bitmap('s1.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s2.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s3.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s4.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s5.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s6.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s7.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s8.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s9.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s10.gif')).set({scaleX:0.5,scaleY:0.5});
-				// var a_place=stage.addChild(new createjs.Bitmap('s11.gif')).set({scaleX:0.5,scaleY:0.5});
-				var a_place=stage.addChild(new createjs.Bitmap('s12.gif')).set({scaleX:0.5,scaleY:0.5});
 			};
 
 			// Assets path
