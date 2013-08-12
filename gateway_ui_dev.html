@@ -10,53 +10,107 @@
 
 	<!-- 定義路口訊息視窗類別 -->
 	<script>
-		var road_infomation=function(x,y,data){
-			if(road_infomation.current){road_infomation.current.parent.removeChild(road_infomation.current);}
+		// 下交流道各路口資訊
+		var infomation_window=function(item,x,y){
+			if(infomation_window.current){try{infomation_window.current.parent.removeChild(infomation_window.current);}catch(e){};}
 
 			// 外框
 			this.initialize();
-			this.x=x || 0;this.y=y || 0;
-			var g = new createjs.Graphics().setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(250,200,100)).beginFill(createjs.Graphics.getRGB(235,130,0,0.5)).drawRoundRect(0,0,500,80,8);
+			var x=x || 560;
+			var y=y || 20;
+			this.x=x;
+			this.y=y;
+			var g = new createjs.Graphics().setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(250,200,100)).beginFill(createjs.Graphics.getRGB(235,130,0,0.5)).drawRect(0,0,220,80);
 			var s = new createjs.Shape(g);
 			this.addChild(s);
 
 			// 關閉按鈕
 			var close_bt=new createjs.Container();
 			var text = new createjs.Text("X", "bold 18px Arial", "#0000FF");
-			text.x=478;
+			text.x=198;
 			text.y=5;
 			this.x=x || 0;this.y=y || 0;
 			var g = new createjs.Graphics();
 			g.setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,0,0.5)).drawRect(-10,-10,20,20);
 			var s = new createjs.Shape(g);
-			s.x=484;
+			s.x=204;
 			s.y=15;
-			s.addEventListener('mouseover',function(e){e.target.graphics.clear().setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,200,0.9)).drawRect(-10,-10,20,20);e.target.addEventListener('click',function(ee){ee.target.parent.parent.parent.removeChild(ee.target.parent.parent);road_infomation.current=undefined;});document.body.style.cursor='pointer';});
+			s.addEventListener('mouseover',function(e){e.target.graphics.clear().setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,200,0.9)).drawRect(-10,-10,20,20);e.target.addEventListener('click',function(ee){ee.target.parent.parent.parent.removeChild(ee.target.parent.parent);infomation_window.current=undefined;});document.body.style.cursor='pointer';});
 			s.addEventListener('mouseout',function(e){e.target.graphics.clear().setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,0,0.5)).drawRect(-10,-10,20,20);document.body.style.cursor='';});
 			close_bt.addChild(s);
 			close_bt.addChild(text);
 			this.addChild(close_bt);
 
 			// 如果有資料需要顯示的資料則...
-			if(data){
-				console.log(data);
-
-				for(var i=1;i<=12;i+=3){
-					this.addChild(new createjs.Bitmap('s'+(i)+'.gif')).set({scaleX:0.5,scaleY:0.5,regX:32.5,regY:32.5,x:25+35*(i-1),y:20});
-					this.addChild(new createjs.Bitmap('s'+(i+1)+'.gif')).set({scaleX:0.5,scaleY:0.5,regX:32.5,regY:32.5,x:25+35*(i-1+1),y:20});
-					this.addChild(new createjs.Bitmap('s'+(i+2)+'.gif')).set({scaleX:0.5,scaleY:0.5,regX:32.5,regY:32.5,x:25+35*(i-1+2),y:20});
+			if(item){
+				// 顯示燈號
+				for(var i in item.light.split(',')){
+					this.addChild(new createjs.Bitmap('s'+(item.light.split(',')[i])+'.gif')).set({scaleX:0.5,scaleY:0.5,regX:32.5,regY:32.5,x:55+35*(i-1),y:22});
 				};
+
+				// 顯示該 Phase 的數據
+				var sc=new createjs.Container();
+				// 外框
+				var g = new createjs.Graphics();
+				g.setStrokeStyle(0.2).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,0,0.9)).drawRect(-10+15,45,item.light.split(',').length*35,30);
+				var s = new createjs.Shape(g);
+				sc.addChild(s);
+				// 文字
+				var sc_txt = new createjs.Text(item.value.toString(), "bold 18px Arial", "#0000FF");
+				sc_txt.set({ x:-10+25, y:50 });
+				sc.addChild(sc_txt);
+				// 
+				this.addChild(sc);
 			};
 
 			// init
 			this.alpha=0;createjs.Tween.get(this).to({alpha:1},500);
-			road_infomation.current=this;
-		};road_infomation.prototype=new createjs.Container();road_infomation.current=undefined;
+			infomation_window.current=this;
+		};infomation_window.prototype=new createjs.Container();infomation_window.current=undefined;
+
+		// 南北向匝道資訊
+		var queue_len_window=function(queue_len_data,x,y){
+			if(queue_len_window.current){try{queue_len_window.current.parent.removeChild(queue_len_window.current);}catch(e){};}
+
+			// 外框
+			this.initialize();
+			var x=x || 560;
+			var y=y || 20;
+			this.x=x;
+			this.y=y;
+			var g = new createjs.Graphics().setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(250,200,100)).beginFill(createjs.Graphics.getRGB(185,30,0,0.5)).drawRect(0,0,220,80);
+			var s = new createjs.Shape(g);
+			this.addChild(s);
+
+			if(queue_len_data){
+				// 顯示該 Queue Len 的數據
+				var sc=new createjs.Container();
+				var s = new createjs.Shape( new createjs.Graphics().setStrokeStyle(0.1).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(155,185,0,0.9)).drawRect(0,30,220,30) );
+				sc.addChild(s);
+				var s = new createjs.Shape( new createjs.Graphics().setStrokeStyle(0.1).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(0,155,0,0.9)).drawRect(0,60,220,30) );
+				sc.addChild(s);
+				var s = new createjs.Shape( new createjs.Graphics().setStrokeStyle(0.1).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(0,155,255,0.9)).drawRect(0,90,220,30) );
+				sc.addChild(s);
+
+				// 南北向計算車隊長後的顯示視窗
+				var sc_txt = new createjs.Text(queue_len_data.label, "bold 18px Arial", "#FAFAFA");sc_txt.set({ x:10, y:4+30*0 });sc.addChild(sc_txt);
+				var sc_txt = new createjs.Text(queue_len_data.datas[queue_len_window.current_dir].vph+' VPH', "bold 18px Arial", "#FAFAFA");sc_txt.set({ x:10, y:4+30*(0+1) });sc.addChild(sc_txt);
+				var sc_txt = new createjs.Text(queue_len_data.datas[queue_len_window.current_dir].km_h+' KM/H', "bold 18px Arial", "#FAFAFA");sc_txt.set({ x:10, y:4+30*(1+1) });sc.addChild(sc_txt);
+				var sc_txt = new createjs.Text(queue_len_data.datas[queue_len_window.current_dir].m+' 公尺', "bold 18px Arial", "#FAFAFA");sc_txt.set({ x:10, y:4+30*(2+1) });sc.addChild(sc_txt);
+
+				// add to stage
+				this.addChild(sc);
+			};
+
+			// init
+			this.alpha=0;createjs.Tween.get(this).to({alpha:1},500);
+			queue_len_window.current=this;
+		};queue_len_window.prototype=new createjs.Container();queue_len_window.current=undefined;
 	</script>
 
 	<!-- 定義紅綠燈類別 -->
 	<script>
-		var red_green_light=function(x,y,click_handle){
+		var red_green_light=function(x,y,item){
 			this.initialize();
 			this.x=x || 0;this.y=y || 0;
 			this.scaleX=0.75;this.scaleY=0.75;
@@ -64,7 +118,15 @@
 			a_place.image.onload=function(e){a_place.set({x:-a_place.image.width/2,y:-a_place.image.height/2});};
 			this.addEventListener('mouseover',function(e){createjs.Tween.get(e.target).to({scaleX:1,scaleY:1},150);document.body.style.cursor='pointer';});
 			this.addEventListener('mouseout',function(e){createjs.Tween.get(e.target).to({scaleX:0.75,scaleY:0.75},200);document.body.style.cursor='';});
-			if(click_handle){this.addEventListener('click',click_handle);};
+			if(item){
+				this.addEventListener('click',function(e){
+					stage.addChild(
+						(new infomation_window(item))//.set({x:e.target.x+20,y:e.target.y-20})	/*強制移動位置*/
+					);
+					// 該 Phase 的位置
+					console.log(e.target.x,e.target.y);
+				});
+			};
 		};red_green_light.prototype=new createjs.Container();
 	</script>
 
@@ -72,18 +134,147 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			// override JQuery
-			$.prototype.create_scene=function(map_image_src,after_scene_build_do_something,debug_mode){
+			$.prototype.create_scene=function(gateway_data,debug_mode){//(map_image_src,after_scene_build_do_something,debug_mode){
+				var phases=new Array;
+				var cal_queue_len_bt;
+				this.css({position:'relative'});
 				var debug_mode=debug_mode||false;
 				if(this.length!=0){
-					var stage = new createjs.Stage(this[0]);
+					var stage = new createjs.Stage(this[0]);window.stage=stage;/*增加一個全域的Ref*/
 					stage.enableMouseOver(20);
-					var bgimg = stage.addChild( new createjs.Bitmap(map_image_src) ).set({scaleX:800/952,scaleY:600/714});
+					var bgimg = stage.addChild( new createjs.Bitmap(gateway_data.scene_path) ).set({scaleX:800/952,scaleY:600/714});
 					createjs.Ticker.addEventListener('tick',function(e){stage.update();});
-					if(after_scene_build_do_something){after_scene_build_do_something(stage);};
+					// 建立場景物建
+					if(gateway_data.data){
+						// 下交流道後各路口的資訊
+						if(gateway_data.data.items){
+							for(var dir in gateway_data.data.items){
+								for(var i in gateway_data.data.items[dir]){
+									var phase=new red_green_light( gateway_data.data.items[dir][i].position.x, gateway_data.data.items[dir][i].position.y, gateway_data.data.items[dir][i] );
+									phase.dir=dir;
+									phases.push(phase);
+								};
+							};
+						};
+
+						// 主幹道資訊
+						if(gateway_data.data.info){
+							// 南下
+							if(gateway_data.data.info.S){
+								var ss1=new createjs.Container();
+								var g1 = new createjs.Graphics();
+								g1.setStrokeStyle(0.01).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,155,100,0.01)).drawRect(-10,0,350,25);
+								var s1 = new createjs.Shape(g1).set({ x:gateway_data.data.info.S.position.x, y:gateway_data.data.info.S.position.y });stage.addChild(s1);
+
+								ss1.addChild(new createjs.Text("Flow: "+gateway_data.data.info.S.flow+"vph, speed: "+gateway_data.data.info.S.speed+" KM/H →", "bold 20px 微軟正黑體", "#6900D2").set({ x:gateway_data.data.info.S.position.x, y:gateway_data.data.info.S.position.y }));
+								stage.addChild(ss1);
+
+								s1.addEventListener('click',function(e){
+									queue_len_window.current_dir='S';
+
+									// 移除路口
+									for(var i in phases){
+										stage.removeChild(phases[i]);
+									};
+
+									// 新增路口
+									for(var i in phases){
+										phases[i].dir=='S' ? stage.addChild(phases[i]) : undefined;
+									};
+
+									stage.addChild(cal_queue_len_bt);
+
+									var queue_len_data={ label:gateway_data.label+( queue_len_window.current_dir=='S' ? '(南下)' : '(北上)' ), datas:gateway_data.data.button.queue_len_data };
+									stage.addChild( new queue_len_window (queue_len_data, 0, 460 ) );
+								});
+
+								s1.addEventListener('mouseover',function(e){
+									document.body.style.cursor='pointer';
+								});
+
+								s1.addEventListener('mouseout',function(e){
+									document.body.style.cursor='';
+								});
+							}
+							// 北上
+							if(gateway_data.data.info.N){
+								var ss2=new createjs.Container();
+								var g2 = new createjs.Graphics();
+								g2.setStrokeStyle(0.01).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,155,100,0.01)).drawRect(-10,-0,350,25);
+								var s2 = new createjs.Shape(g2).set({ x:gateway_data.data.info.N.position.x, y:gateway_data.data.info.N.position.y });stage.addChild(s2);
+
+								ss2.addChild(new createjs.Text("← Flow: "+gateway_data.data.info.N.flow+"vph, speed: "+gateway_data.data.info.N.speed+" KM/H", "bold 20px 微軟正黑體", "#6900D2").set({ x:gateway_data.data.info.N.position.x, y:gateway_data.data.info.N.position.y }));
+								stage.addChild(ss2);
+
+								s2.addEventListener('click',function(e){
+									queue_len_window.current_dir='N';
+
+									// 移除路口
+									for(var i in phases){
+										stage.removeChild(phases[i]);
+									};
+
+									// 新增路口
+									for(var i in phases){
+										phases[i].dir=='N' ? stage.addChild(phases[i]) : undefined;
+									};
+
+									stage.addChild(cal_queue_len_bt);
+
+									var queue_len_data={ label:gateway_data.label+( queue_len_window.current_dir=='S' ? '(南下)' : '(北上)' ), datas:gateway_data.data.button.queue_len_data };
+									stage.addChild( new queue_len_window (queue_len_data, 0, 460 ) );
+
+								});
+
+								s2.addEventListener('mouseover',function(e){
+									document.body.style.cursor='pointer';
+								});
+
+								s2.addEventListener('mouseout',function(e){
+									document.body.style.cursor='';
+								});
+							}
+						};
+					};
+
+					// 計算Queue長度的按鈕
+					cal_queue_len_bt=new createjs.Container();
+					var g = new createjs.Graphics();
+					g.setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,200,0.9)).drawRect(-60,-20,120,40);
+					var s = new createjs.Shape(g);
+					s.addEventListener('mouseover',function(e){
+						e.target.graphics.clear().setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,155,100,0.9)).drawRect(-60,-20,120,40);
+						document.body.style.cursor='pointer';
+						e.target.addEventListener('mouseout',function(ee){
+							e.target.graphics.clear().setStrokeStyle(0.5).beginStroke(createjs.Graphics.getRGB(0,0,0)).beginFill(createjs.Graphics.getRGB(255,255,200,0.9)).drawRect(-60,-20,120,40);
+							document.body.style.cursor='';
+						});
+					});
+					//
+					s.addEventListener('click',function(e){
+						console.log('顯示'+queue_len_window.current_dir+'車隊長');
+					});
+					// 
+					cal_queue_len_bt.addChild(s);
+					var txt=new createjs.Text('車隊長', "bold 20px 微軟正黑體", "#026842").set({ x:-30, y:-11 });
+					cal_queue_len_bt.addChild(txt);
+					cal_queue_len_bt.set({x:gateway_data.data.button.position.x,y:gateway_data.data.button.position.y});/*container*/
+
+					// 除錯模式
 					if(debug_mode){
-						// stage.addEventListener('click',function(e){
-							// console.log(e.stageX,e.stageY);
-						// });
+						stage.addEventListener('stagemousedown',function(e){
+							window.mouse_path=new Array;
+							var mh;
+							e.target.addEventListener('stagemousemove',mh=function(ee){
+								console.log(ee.stageX,ee.stageY);
+								window.mouse_path.push([ee.stageX,ee.stageY]);
+							});
+
+							e.target.addEventListener('stagemouseup',function(ee){
+								e.target.removeEventListener('stagemousemove',mh);
+								console.log(window.mouse_path);
+							});
+						});
 					};
 				};
 			}
@@ -93,34 +284,51 @@
 	<!-- Sample Code -->
 	<script>
 		$(document).ready(function(){
-			// gateway_2_objects
-			var gateway_2_objects=function(stage){
-				stage.addChild(new red_green_light( 435, 140, function(){
-					console.log(stage.addChild(new road_infomation(270,20,'data1')));
-				}));
-				stage.addChild(new red_green_light( 435, 200, function(){
-					console.log(stage.addChild(new road_infomation(270,20,'data2')));
-				}));
-				stage.addChild(new red_green_light( 435, 310, function(e){
-					console.log(stage.addChild(new road_infomation(270,20,'data3')));
-				}));
-
-				stage.addChild(new createjs.Text("Flow: 2010vph, speed: 68 KM/H →", "bold 20px 微軟正黑體", "#6900D2").set({x:220,y:225}));
-				stage.addChild(new createjs.Text("← Flow: 1980vph, speed: 50 KM/H", "bold 20px 微軟正黑體", "#6900D2").set({x:220,y:265}));
-			};
-
 			// Assets path
 			window.red_green_light_img_path='red_green_light.gif';
-			var scene_img_path={
+
+			// 這張地圖的繪圖依據(日後資料結構的Pattern)
+			var gateway_datas={
 				2:{
-					scene:'2.png',
-					objects:gateway_2_objects,
+					scene_path:'2.png',
+					label:'石碇下匝道',
+					data:{
+						info:{
+							N:{
+								flow:2010,
+								speed: 68,
+								position: { x:220, y:225 }
+							},
+							S:{
+								flow:1980,
+								speed: 78,
+								position: { x:220, y:265 }
+							},
+						},
+						items:{
+							N:{
+								road1:{ light:'1,3,2,4', value:999, position:{ x:435, y:140 } },
+								road2:{ light:'3,2,1', value:10, position:{ x:435, y:200 } },
+							},
+							S:{
+								road3:{ light:'4,6', value:1024, position:{ x:435, y:310 } },
+							},
+						},
+						button:{
+							text:'車隊長',
+							position:{ x:80 ,y:40 },
+							queue_len_data:{
+								S:{ vph:10,km_h:20,m:30 },
+								N:{ vph:40,km_h:50,m:60 },
+							}
+						}
+					},
 					red_green_light_img_path:'red_green_light.gif'
 				}
 			};
 
 			// gateway_2_scene
-			$('canvas#gateway_scene').create_scene(scene_img_path[2].scene,scene_img_path[2].objects,true);
+			$('canvas#gateway_scene').create_scene( gateway_datas[2], true );
 		});
 	</script>
 </body>
